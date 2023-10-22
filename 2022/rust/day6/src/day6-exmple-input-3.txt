@@ -1,0 +1,1 @@
+../../../data/day6-exmple-input-3.txt

@@ -1,0 +1,1 @@
+../../../data/day6-input.txt
