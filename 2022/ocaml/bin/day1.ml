@@ -28,9 +28,9 @@ let part1_answer input =
 let () =
   Stdio.print_endline "=== Part 1 ===";
   Stdio.print_string "Demo: ";
-  Advent.read_lines "./inputs/day1-demo.txt" |> part1_answer;
+  Advent.read_lines "../data/day1-example-input.txt" |> part1_answer;
   Stdio.print_string "Answer: ";
-  Advent.read_lines "./inputs/day1.txt" |> part1_answer
+  Advent.read_lines "../data/day1-input.txt" |> part1_answer
 
 (* Part 2 *)
 let max_3_of_list input =
@@ -56,6 +56,6 @@ let part2_answer input =
 let () =
   Stdio.print_endline "=== Part 2 ===";
   Stdio.print_string "Demo: ";
-  Advent.read_lines "./inputs/day1-demo.txt" |> part2_answer;
+  Advent.read_lines "../data/day1-example-input.txt" |> part2_answer;
   Stdio.print_string "Answer: ";
-  Advent.read_lines "./inputs/day1.txt" |> part2_answer
+  Advent.read_lines "../data/day1-input.txt" |> part2_answer
