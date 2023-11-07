@@ -31,13 +31,12 @@ module Rucksack = struct
       match Set.nth inter_set 0 with
       | None -> failwith "There should be one common item"
       | Some a -> a
-
-  let priority rucksack =
-    let open Stdlib.Char in
-    let ci = common_item rucksack in
-    if compare ci 'z' >= -25 then code ci - (code 'a' - 1)
-    else code ci - (code 'A' - 1) + 26
 end
+
+let priority c =
+  let open Stdlib.Char in
+  if compare c 'z' >= -25 then code c - (code 'a' - 1)
+  else code c - (code 'A' - 1) + 26
 
 module Rucksacks = struct
   type t = Rucksack.t list
@@ -46,7 +45,9 @@ module Rucksacks = struct
   (* let common_items (rucksacks : t) = List.map rucksacks ~f:Rucksack.common_item *)
 
   let priority (rucksacks : t) =
-    List.map rucksacks ~f:Rucksack.priority |> List.fold_left ~f:( + ) ~init:0
+    List.map rucksacks ~f:Rucksack.common_item
+    |> List.map ~f:priority
+    |> List.fold_left ~f:( + ) ~init:0
 end
 
 let part1_answer input =
@@ -61,3 +62,43 @@ let () =
   Advent.read_lines "../data/day3-example-input.txt" |> part1_answer;
   Stdio.print_string "Answer: ";
   Advent.read_lines "../data/day3-input.txt" |> part1_answer
+
+let badget_item l1 l2 l3 =
+  let s1 =
+    String.to_list l1 |> List.fold ~init:(Set.empty (module Char)) ~f:Set.add
+  in
+  let s2 =
+    String.to_list l2 |> List.fold ~init:(Set.empty (module Char)) ~f:Set.add
+  in
+  let s3 =
+    String.to_list l3 |> List.fold ~init:(Set.empty (module Char)) ~f:Set.add
+  in
+  let inter_set = s1 |> Set.inter s2 |> Set.inter s3 in
+  if Set.length inter_set <> 1 then
+    failwith "The amount of common items isn't one"
+  else
+    match Set.nth inter_set 0 with
+    | None -> failwith "There should be one common item"
+    | Some a -> a
+
+let badget_priorities l =
+  let rec _badget_priorities l result =
+    match l with
+    | [] -> result
+    | l1 :: l2 :: l3 :: tl ->
+        _badget_priorities tl (badget_item l1 l2 l3 :: result)
+    | _ -> failwith "Invalid input isn't divisible by 3"
+  in
+  _badget_priorities l [] |> List.map ~f:priority
+
+let part2_answer input =
+  input |> badget_priorities
+  |> List.fold_left ~f:( + ) ~init:0
+  |> Int.to_string |> Stdio.print_endline
+
+let () =
+  Stdio.print_endline "=== Part 2 ===";
+  Stdio.print_string "Demo: ";
+  Advent.read_lines "../data/day3-example-input.txt" |> part2_answer;
+  Stdio.print_string "Answer: ";
+  Advent.read_lines "../data/day3-input.txt" |> part2_answer
