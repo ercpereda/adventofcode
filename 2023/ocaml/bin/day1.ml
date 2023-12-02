@@ -36,7 +36,7 @@ let () =
   Stdio.print_string "Answer: ";
   Advent.read_lines "../data/day1-input.txt" |> part1_answer
 
-let rec add_digits_to_line (line: char list) =
+let rec add_digits_to_line line =
   match line with
   | [] -> []
   | 'z' :: 'e' :: 'r' :: 'o' :: rest -> '0' :: 'z' :: 'e' :: 'r' :: 'o' :: add_digits_to_line ('e' :: 'r' :: 'o' :: rest)
