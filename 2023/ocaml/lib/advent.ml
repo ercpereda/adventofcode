@@ -20,3 +20,5 @@ let print_listof_ints ints =
   printf "%a \n"
     (pp_print_list ~pp_sep:(fun fmt () -> fprintf fmt "; ") pp_print_int)
     ints
+
+let sum_listof_ints = List.fold ~init:0 ~f:( + )
