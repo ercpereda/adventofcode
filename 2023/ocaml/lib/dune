@@ -1,3 +1,5 @@
 (library
  (name advent)
- (libraries "str" "base"))
+ (libraries base stdio str unix)
+ (inline_tests (flags (-verbose)))
+ (preprocess (pps ppx_inline_test)))
