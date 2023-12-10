@@ -1,4 +1,3 @@
-open Base
 open Advent__Day7
 
 let () =
