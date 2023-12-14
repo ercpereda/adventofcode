@@ -1,7 +1,11 @@
+open Base;;
 
 (* open Advent__Day11;; *)
 (* let input = Advent.read_lines "../data/day11-example-input.txt" ;; *)
 (* let sm = SkyMap.of_string_list input;; *)
 
 open Advent__Day12;;
-let input = Advent.read_lines "../data/day12-example-input.txt" ;;
+let input = Advent.read_lines "../data/day12-example-input.txt";;
+let line = input |> List.hd_exn;;
+let springs, damage_groups = parse_line line;;
+let results = List.map input ~f:(fun l -> let s, dg = parse_line l in arrangements s dg false);;
