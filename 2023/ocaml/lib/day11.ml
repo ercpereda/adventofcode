@@ -29,22 +29,6 @@ module SkyMap = struct
     done;
     !result
 
-  type expanded_galaxy_coords = {
-    coords: (int * int) array;
-    exp_cols: int list;
-    exp_rows: int list;
-    i_expantion: int;
-    j_expantion: int;
-  }
-
-  let create_expanded_galaxy_coords sm = {
-    coords = Array.create (0, 0) ~len:0;
-    exp_cols = expanded_cols sm;
-    exp_rows = expanded_rows sm;
-    i_expantion = 0;
-    j_expantion = 0;
-  }
-
   let galaxies_coords (sm: t) =
     let galaxies_in_row row = row 
       |> Array.filter_mapi ~f:(fun i c -> if Char.equal c '#' then Some i else None)
