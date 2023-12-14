@@ -1,0 +1,3 @@
+open Advent__Day11;;
+let input = Advent.read_lines "../data/day11-example-input.txt" ;;
+let sm = SkyMap.of_string_list input;;
