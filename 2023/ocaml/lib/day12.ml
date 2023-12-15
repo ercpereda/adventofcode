@@ -48,6 +48,31 @@ let part1_answer input = input
   |> Int.to_string
   |> Stdio.print_endline
 
+let unfold_springs_string springs = List.range 0 5
+  |> List.fold ~init:[] ~f:( fun acc _ -> (springs::acc) )
+  |> String.concat ~sep:"?"
+
+let parse_spring_with_unfold s = s
+  |> unfold_springs_string
+  |> parse_springs
+
+let unfold_danger_groups_string dg = List.range 0 5
+  |> List.fold ~init:[] ~f:( fun acc _ -> (dg::acc) )
+  |> String.concat ~sep:","
+
+let parse_damanage_groups_with_unfold s = s
+  |> unfold_danger_groups_string
+  |> parse_damanage_groups
+
+let parse_line_with_unfold l =
+  match String.split l ~on:' ' with
+  | [s; dg] -> parse_spring_with_unfold s, parse_damanage_groups_with_unfold dg
+  | _ -> invalid_arg ("Invalida line " ^ l)
+
 let part2_answer _input =
-  "Not implemented"
+  "Too slow"
   |> Stdio.print_endline
+  (* |> List.mapi ~f:(fun i l -> (Stdio.print_endline (Int.to_string i ^ " | " ^ l) ;let s, dg = parse_line_with_unfold l in arrangements s dg false)) *)
+  (* |> List.fold ~init:0 ~f:( + ) *)
+  (* |> Int.to_string *)
+  (* |> Stdio.print_endline *)
