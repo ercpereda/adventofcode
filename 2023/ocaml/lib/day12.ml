@@ -28,33 +28,33 @@ let to_string springs damage_groups =
 
 let arrangements springs damage_groups =
   let rec _arrangements springs damage_groups in_group cache =
+    match springs, damage_groups, in_group with
+    | [], [], _ -> cache, 1
+    | [], 0::dgs_rest, _ -> cached_call [] dgs_rest false cache
+    | [], _::_, _ -> cache, 0
+
+    | '#'::_, [], _ -> cache, 0
+    | '#'::_, 0::_, _ -> cache, 0
+    | '#'::spring_rest, dg::dgs_rest, _ -> cached_call spring_rest ((dg-1)::dgs_rest) true cache
+
+    | '.'::spring_rest, [], _ -> cached_call spring_rest [] false cache
+    | '.'::spring_rest, 0::dgs_rest, true -> cached_call spring_rest dgs_rest false cache
+    | '.'::_, _::_, true -> cache, 0
+    | '.'::spring_rest, dg::dgs_rest, false -> cached_call spring_rest (dg::dgs_rest) false cache
+
+    | '?'::spring_rest, [], _ -> cached_call ('.'::spring_rest) [] false cache
+    | '?'::spring_rest, dgs, _
+        ->  let c, x = cached_call ('#'::spring_rest) dgs in_group cache in
+            let c', y = cached_call ('.'::spring_rest) dgs in_group c in
+            c', x + y
+
+    | _ -> failwith ((springs |> List.map ~f:Char.to_string |> String.concat ~sep:"") ^ " " ^ (damage_groups |> List.map ~f:Int.to_string |> String.concat ~sep:","))
+  and cached_call springs damage_groups in_group cache =
     let key = to_string springs damage_groups in
     match Map.find cache key with
     | Some x -> cache, x
-    | None -> begin
-        match springs, damage_groups, in_group with
-        | [], [], _ -> cache, 1
-        | [], 0::dgs_rest, _ -> let c, x = _arrangements [] dgs_rest false cache in Map.set c ~key ~data:x, x
-        | [], _::_, _ -> cache, 0
-
-        | '#'::_, [], _ -> cache, 0
-        | '#'::_, 0::_, _ -> cache, 0
-        | '#'::spring_rest, dg::dgs_rest, _ -> let c, x = _arrangements spring_rest ((dg-1)::dgs_rest) true cache in Map.set c ~key ~data:x, x
-
-        | '.'::spring_rest, [], _ -> let c, x = _arrangements spring_rest [] false cache in Map.set c ~key ~data:x, x
-        | '.'::spring_rest, 0::dgs_rest, true -> let c, x = _arrangements spring_rest dgs_rest false cache in Map.set c ~key ~data:x, x
-        | '.'::_, _::_, true -> cache, 0
-        | '.'::spring_rest, dg::dgs_rest, false -> let c, x = _arrangements spring_rest (dg::dgs_rest) false cache in Map.set c ~key ~data:x, x
-
-        | '?'::spring_rest, [], _ -> let c, x = _arrangements ('.'::spring_rest) [] false cache in Map.set c ~key ~data:x, x
-        | '?'::spring_rest, dgs, _
-            ->  let c, x = _arrangements ('#'::spring_rest) dgs in_group cache in
-                let cache' = Map.set c ~key:(to_string ('#'::spring_rest) dgs) ~data:x in
-                let c', y = _arrangements ('.'::spring_rest) dgs in_group cache' in
-                Map.set c' ~key:(to_string ('.'::spring_rest) dgs) ~data:y, x + y
-
-        | _ -> failwith ((springs |> List.map ~f:Char.to_string |> String.concat ~sep:"") ^ " " ^ (damage_groups |> List.map ~f:Int.to_string |> String.concat ~sep:","))
-      end
+    | None -> let c, x = _arrangements springs damage_groups in_group cache in
+              Map.set c ~key ~data:x, x
   in
   _arrangements springs damage_groups false (Map.empty (module String))
 
