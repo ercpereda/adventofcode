@@ -21,29 +21,45 @@ let rec validate_group springs damage_group =
   | hd::tl when (Char.equal '.' hd && damage_group = 0) -> true, tl
   | _ -> failwith ((springs |> List.map ~f:Char.to_string |> String.concat ~sep:"") ^ " " ^ (damage_group |> Int.to_string ))
 
-let rec arrangements springs damage_groups in_group =
-  match springs, damage_groups, in_group with
-  | [], [], _ -> 1
-  | [], 0::dgs_rest, _ -> arrangements [] dgs_rest false
-  | [], _::_, _ -> 0
+let to_string springs damage_groups =
+  let springs_s = List.map springs ~f:Char.to_string |> String.concat ~sep:"" in
+  let damage_groups_s = List.map damage_groups ~f:Int.to_string |> String.concat ~sep:"," in
+  springs_s ^ "|" ^ damage_groups_s
 
-  | '#'::_, [], _ -> 0
-  | '#'::_, 0::_, _ -> 0
-  | '#'::spring_rest, dg::dgs_rest, _ -> arrangements spring_rest ((dg-1)::dgs_rest) true
+let arrangements springs damage_groups =
+  let rec _arrangements springs damage_groups in_group cache =
+    let key = to_string springs damage_groups in
+    match Map.find cache key with
+    | Some x -> cache, x
+    | None -> begin
+        match springs, damage_groups, in_group with
+        | [], [], _ -> cache, 1
+        | [], 0::dgs_rest, _ -> let c, x = _arrangements [] dgs_rest false cache in Map.set c ~key ~data:x, x
+        | [], _::_, _ -> cache, 0
 
-  | '.'::spring_rest, [], _ -> arrangements spring_rest [] false
-  | '.'::spring_rest, 0::dgs_rest, true -> (arrangements spring_rest dgs_rest false)
-  | '.'::_, _::_, true -> 0
-  | '.'::spring_rest, dg::dgs_rest, false -> (arrangements spring_rest (dg::dgs_rest) false)
+        | '#'::_, [], _ -> cache, 0
+        | '#'::_, 0::_, _ -> cache, 0
+        | '#'::spring_rest, dg::dgs_rest, _ -> let c, x = _arrangements spring_rest ((dg-1)::dgs_rest) true cache in Map.set c ~key ~data:x, x
 
-  | '?'::spring_rest, [], _ -> arrangements ('.'::spring_rest) [] false
-  | '?'::spring_rest, dgs, _
-      -> (arrangements ('#'::spring_rest) dgs in_group) + (arrangements ('.'::spring_rest) dgs in_group)
+        | '.'::spring_rest, [], _ -> let c, x = _arrangements spring_rest [] false cache in Map.set c ~key ~data:x, x
+        | '.'::spring_rest, 0::dgs_rest, true -> let c, x = _arrangements spring_rest dgs_rest false cache in Map.set c ~key ~data:x, x
+        | '.'::_, _::_, true -> cache, 0
+        | '.'::spring_rest, dg::dgs_rest, false -> let c, x = _arrangements spring_rest (dg::dgs_rest) false cache in Map.set c ~key ~data:x, x
 
-  | _ -> failwith ((springs |> List.map ~f:Char.to_string |> String.concat ~sep:"") ^ " " ^ (damage_groups |> List.map ~f:Int.to_string |> String.concat ~sep:","))
+        | '?'::spring_rest, [], _ -> let c, x = _arrangements ('.'::spring_rest) [] false cache in Map.set c ~key ~data:x, x
+        | '?'::spring_rest, dgs, _
+            ->  let c, x = _arrangements ('#'::spring_rest) dgs in_group cache in
+                let cache' = Map.set c ~key:(to_string ('#'::spring_rest) dgs) ~data:x in
+                let c', y = _arrangements ('.'::spring_rest) dgs in_group cache' in
+                Map.set c' ~key:(to_string ('.'::spring_rest) dgs) ~data:y, x + y
+
+        | _ -> failwith ((springs |> List.map ~f:Char.to_string |> String.concat ~sep:"") ^ " " ^ (damage_groups |> List.map ~f:Int.to_string |> String.concat ~sep:","))
+      end
+  in
+  _arrangements springs damage_groups false (Map.empty (module String))
 
 let part1_answer input = input
-  |> List.map ~f:(fun l -> let s, dg = parse_line l in arrangements s dg false)
+  |> List.map ~f:(fun l -> let s, dg = parse_line l in arrangements s dg |> snd)
   |> List.fold ~init:0 ~f:( + )
   |> Int.to_string
   |> Stdio.print_endline
@@ -69,10 +85,8 @@ let parse_line_with_unfold l =
   | [s; dg] -> parse_spring_with_unfold s, parse_damanage_groups_with_unfold dg
   | _ -> invalid_arg ("Invalida line " ^ l)
 
-let part2_answer _input =
-  "Too slow"
+let part2_answer input = input
+  |> List.map ~f:(fun l -> let s, dg = parse_line_with_unfold l in arrangements s dg |> snd)
+  |> List.fold ~init:0 ~f:( + )
+  |> Int.to_string
   |> Stdio.print_endline
-  (* |> List.mapi ~f:(fun i l -> (Stdio.print_endline (Int.to_string i ^ " | " ^ l) ;let s, dg = parse_line_with_unfold l in arrangements s dg false)) *)
-  (* |> List.fold ~init:0 ~f:( + ) *)
-  (* |> Int.to_string *)
-  (* |> Stdio.print_endline *)

@@ -8,6 +8,6 @@ open Advent__Day12;;
 let input = Advent.read_lines "../data/day12-example-input.txt";;
 let line = input |> List.hd_exn;;
 let springs, damage_groups = parse_line line;;
-let results = List.map input ~f:(fun l -> let s, dg = parse_line l in arrangements s dg false);;
+let results = List.map input ~f:(fun l -> let s, dg = parse_line l in arrangements s dg);;
 let usprings, udamage_groups = parse_line_with_unfold line;;
-let uresults = List.map input ~f:(fun l -> let s, dg = parse_line_with_unfold l in arrangements s dg false);;
+let uresults = List.map input ~f:(fun l -> let s, dg = parse_line_with_unfold l in arrangements s dg);;
